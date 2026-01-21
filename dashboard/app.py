@@ -3,6 +3,7 @@ import pandas as pd
 import sqlite3
 import plotly.express as px
 import os
+import sys
 import subprocess
 
 # ----------------------------------
@@ -25,22 +26,29 @@ def safe_metric(value):
     return f"{value:,.0f}" if value is not None else "0"
 
 # ----------------------------------
-# Database connection
+# Resolve base paths (CLOUD SAFE)
 # ----------------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+DB_PATH = os.path.join(DATA_DIR, "sales_dw.db")
+LOAD_SCRIPT = os.path.join(BASE_DIR, "etl", "load.py")
 
+# Ensure data directory exists
+os.makedirs(DATA_DIR, exist_ok=True)
 
-
-DB_PATH = "data/sales_dw.db"
-
-# Create DB if it does not exist (Streamlit Cloud safe)
+# ----------------------------------
+# Auto-create DB if missing
+# ----------------------------------
 if not os.path.exists(DB_PATH):
     subprocess.run(
-        ["python", "etl/load.py"],
+        [sys.executable, LOAD_SCRIPT],
         check=True
     )
 
+# ----------------------------------
+# Database connection
+# ----------------------------------
 conn = sqlite3.connect(DB_PATH)
-
 
 # ----------------------------------
 # Filter Options
@@ -49,6 +57,7 @@ years_df = pd.read_sql(
     "SELECT DISTINCT order_year FROM fact_sales ORDER BY order_year",
     conn
 )
+
 months_df = pd.read_sql(
     "SELECT DISTINCT order_month FROM fact_sales ORDER BY order_month",
     conn
@@ -91,7 +100,7 @@ if where_conditions:
     where_clause = " WHERE " + " AND ".join(where_conditions)
 
 # ----------------------------------
-# KPI Calculations (SQL driven)
+# KPI Calculations
 # ----------------------------------
 total_revenue = pd.read_sql(
     f"SELECT SUM(order_amount) AS revenue FROM fact_sales {where_clause}",
@@ -153,7 +162,6 @@ monthly_revenue_df = pd.read_sql(
     """,
     conn
 )
-
 
 monthly_revenue_df["year_month"] = (
     monthly_revenue_df["order_year"].astype(str)
@@ -241,7 +249,6 @@ customer_spend_df = pd.read_sql(
 
 col_table, col_chart = st.columns([1, 2])
 
-# LEFT: Table
 with col_table:
     st.dataframe(
         customer_spend_df,
@@ -250,7 +257,6 @@ with col_table:
         height=400
     )
 
-# RIGHT: Chart
 with col_chart:
     fig_customers = px.bar(
         customer_spend_df,
@@ -271,6 +277,6 @@ with col_chart:
     st.plotly_chart(fig_customers, use_container_width=True)
 
 # ----------------------------------
-# Close DB connection
+# Close DB
 # ----------------------------------
 conn.close()
