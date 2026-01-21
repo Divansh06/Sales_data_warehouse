@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import plotly.express as px
+import os
+import subprocess
 
 # ----------------------------------
 # Page Config
@@ -25,7 +27,20 @@ def safe_metric(value):
 # ----------------------------------
 # Database connection
 # ----------------------------------
-conn = sqlite3.connect("data/sales_dw.db")
+
+
+
+DB_PATH = "data/sales_dw.db"
+
+# Create DB if it does not exist (Streamlit Cloud safe)
+if not os.path.exists(DB_PATH):
+    subprocess.run(
+        ["python", "etl/load.py"],
+        check=True
+    )
+
+conn = sqlite3.connect(DB_PATH)
+
 
 # ----------------------------------
 # Filter Options
