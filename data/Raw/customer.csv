@@ -1,0 +1,11 @@
+customer_id,customer_name,email,city,state,signup_date
+101,Arjun Mehta,arjun.mehta@gmail.com,Mumbai,MH,2022-01-15
+102,Riya Sharma,riya.sharma@gmail.com,Delhi,DL,2022-03-10
+103,Aman Verma,aman.verma@gmail.com,Bangalore,KA,2021-11-05
+104,Neha Gupta,neha.gupta@gmail.com,Pune,MH,2022-06-18
+105,Rahul Singh,rahul.singh@gmail.com,Noida,UP,2022-07-02
+106,Priya Nair,priya.nair@gmail.com,Kochi,KL,2021-09-25
+107,Karan Malhotra,karan.m@gmail.com,Delhi,DL,2022-02-14
+108,Simran Kaur,simran.kaur@gmail.com,Chandigarh,CH,2022-04-30
+109,Ankit Patel,ankit.p@gmail.com,Ahmedabad,GJ,2021-12-08
+110,Pooja Iyer,pooja.iyer@gmail.com,Chennai,TN,2022-05-21
